@@ -23,7 +23,7 @@ use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
-use std::sync::mpsc::{channel, Receiver};
+use std::sync::mpsc::{channel, Receiver,sync_channel};
 use std::thread::{spawn, JoinHandle};
 use argparse::{ArgumentParser, StoreTrue, Collect};
 
@@ -86,7 +86,7 @@ fn run_single_threaded(documents: Vec<PathBuf>, output_dir: PathBuf)
 fn start_file_reader_thread(documents: Vec<PathBuf>)
     -> (Receiver<String>, JoinHandle<io::Result<()>>)
 {
-    let (sender, receiver) = channel();
+    let (sender, receiver) = sync_channel(32);//channel();
 
     let handle = spawn(move || {
         for filename in documents {
